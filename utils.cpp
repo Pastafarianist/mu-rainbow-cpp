@@ -371,30 +371,3 @@ std::vector<State> outcomes(State state, Move move) {
     }
     return result;
 }
-
-template<typename T>
-void mark_states_reachable_from(State state, T& storage) {
-    if (state.score >= 40) {
-        return;
-    }
-    else if (not state.deck) {
-        return;
-    }
-    else {
-        assert(not storage[state]);
-        storage[state] = true;
-
-        for (Move& move : moves(state)) {
-            std::vector<State> curr_outcomes = outcomes(state, move);
-            auto num_outcomes = static_cast<int>(curr_outcomes.size());
-            assert(num_outcomes > 0);
-
-            for (State& outcome : curr_outcomes) {
-                if (not storage[outcome]) {
-                    mark_states_reachable_from(outcome, storage);
-                }
-            }
-        }
-    }
-}
-

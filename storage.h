@@ -22,6 +22,8 @@ private:
         std::bitset<bs_size>* bs_;
         std::size_t idx_;
 
+    public:
+
         operator bool() const {
             return (*bs_)[idx_];
         }
