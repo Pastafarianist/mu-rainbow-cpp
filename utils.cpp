@@ -1,21 +1,20 @@
 #include <vector>
 #include <cassert>
 #include <algorithm>
-#include <utility>
 #include <unordered_map>
 
 #include "utils.h"
 
 /* ---------------- Bit operations ---------------- */
 
-int num_ones(int n) {
-    int res = 0;
-    while (n) {
-        res += 1;
-        n = n & (n - 1);
-    }
-    return res;
-}
+//int num_ones(int n) {
+//    int res = 0;
+//    while (n) {
+//        res += 1;
+//        n = n & (n - 1);
+//    }
+//    return res;
+//}
 
 int vector_to_binary(std::vector<int>& v) {
     int res = 0;
@@ -223,81 +222,55 @@ std::vector<Move> moves_from_hand(int hand) {
 
 // ---------------- Cached stuff ----------------
 
-// via https://stackoverflow.com/a/1617797/1214547
-template <typename Iterator>
-bool next_combination(const Iterator first, Iterator k, const Iterator last)
-{
-    /* Credits: Mark Nelson http://marknelson.us */
-    if ((first == last) || (first == k) || (last == k))
-        return false;
-    Iterator i1 = first;
-    Iterator i2 = last;
-    ++i1;
-    if (last == i1)
-        return false;
-    i1 = last;
-    --i1;
-    i2 = k;
-    --i2;
-    while (first != i1)
-    {
-        if (*--i1 < *i2)
-        {
-            Iterator j = k;
-            while (!(*i1 < *j)) ++j;
-            std::iter_swap(i1, j);
-            ++i1;
-            ++j;
-            i2 = k;
-            std::_V2::rotate(i1, j, last);
-            while (last != j)
-            {
-                ++j;
-                ++i2;
-            }
-            std::_V2::rotate(k, i2, last);
-            return true;
-        }
+class CombinationGen {
+private:
+    std::vector<bool> mask;
+    std::size_t n, k;
+    bool is_done;
+
+public:
+    CombinationGen(std::size_t n, std::size_t k) : n(n), k(k), is_done(false) {
+        mask.resize(n);
+        std::fill(mask.begin(), mask.begin() + k, true);
     }
-    std::_V2::rotate(first, k, last);
-    return false;
-}
+
+    bool done() {
+        return is_done;
+    }
+
+    std::vector<int> next() {
+        if (is_done) {
+            throw "Generator is exhausted";
+        }
+
+        std::vector<int> result;
+        result.reserve(k);
+
+        for (int i = 0; i < n; i++) {
+            if (mask[i]) {
+                result.push_back(i);
+            }
+        }
+
+        is_done = not std::prev_permutation(mask.begin(), mask.end());
+        return result;
+    }
+};
 
 std::vector<int> make_hands(std::size_t hand_size) {
     std::vector<int> hands;
 
-    std::vector<int> all_cards;
-    for (int i = 0; i < 24; i++) {
-        all_cards.push_back(i);
-    }
+    CombinationGen gen(24, hand_size);
     do {
-        std::vector<int> hand_as_vector(all_cards.begin(), all_cards.begin() + hand_size);
+        std::vector<int> hand_as_vector = gen.next();
         int hand = vector_to_binary(hand_as_vector);
         hands.push_back(hand);
-    } while (next_combination(all_cards.begin(), all_cards.begin() + hand_size, all_cards.end()));
+    } while (not gen.done());
 
     return hands;
 }
 
 std::vector<int> hands5 = make_hands(5);
-
-std::unordered_map<int, std::vector<Move>> make_moves_cache() {
-    std::unordered_map<int, std::vector<Move>> moves_cache;
-    for (int hand : hands5) {
-        moves_cache[hand] = moves_from_hand(hand);
-    }
-    return moves_cache;
-}
-
-std::vector<State> make_starting_states() {
-    std::vector<State> result;
-    for (int hand : hands5) {
-        int compact_deck = (1 << 19) - 1;
-        int deck = expand_deck(hand, compact_deck);
-        result.push_back(State {0, hand, deck});
-    }
-    return result;
-}
 //std::vector<int> hands4 = make_hands(4);
 //std::vector<int> hands3 = make_hands(3);
 //
@@ -311,10 +284,26 @@ std::vector<State> make_starting_states() {
 //
 //std::vector<int> all_hands = make_all_hands();
 
-;
+std::unordered_map<int, std::vector<Move>> make_moves_cache() {
+    std::unordered_map<int, std::vector<Move>> moves_cache;
+    for (int hand : hands5) {
+        moves_cache[hand] = moves_from_hand(hand);
+    }
+    return moves_cache;
+}
 
 // (full hand as a bitmask) -> (list of Move objects)
 std::unordered_map<int, std::vector<Move>> moves_cache = make_moves_cache();
+
+std::vector<State> make_starting_states() {
+    std::vector<State> result;
+    for (int hand : hands5) {
+        int compact_deck = (1 << 19) - 1;
+        int deck = expand_deck(hand, compact_deck);
+        result.push_back(State {0, hand, deck});
+    }
+    return result;
+}
 
 //std::unordered_map<int, int> make_score_change_cache() {
 //    std::unordered_map<int, int> result;
@@ -358,15 +347,23 @@ std::vector<State> outcomes(State state, Move move) {
         // deal
         // the slow part BEGINS
         std::vector<int> deck_vector = binary_to_vector(state.deck);
-        int replenishment = std::min(static_cast<int>(deck_vector.size()), 3);
+        std::size_t replenishment = std::min(deck_vector.size(), static_cast<std::size_t>(3));
 
+        CombinationGen gen(deck_vector.size(), replenishment);
         do {
-            std::vector<int> combo(deck_vector.begin(), deck_vector.begin() + replenishment);
+            std::vector<int> combo_idx = gen.next();
+            std::vector<int> combo;
+            combo.reserve(replenishment);
+
+            for (int idx : combo_idx) {
+                combo.push_back(deck_vector[idx]);
+            }
+
             int mask = vector_to_binary(combo);
             int new_hand = new_hand_partial | mask;
             int new_deck = state.deck ^ mask;
             result.push_back(State {new_score, new_hand, new_deck});
-        } while (next_combination(deck_vector.begin(), deck_vector.begin() + replenishment, deck_vector.end()));
+        } while (not gen.done());
         // the slow part ENDS
     }
     return result;
