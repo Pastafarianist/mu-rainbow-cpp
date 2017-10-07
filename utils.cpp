@@ -16,7 +16,7 @@
 //    return res;
 //}
 
-uint32_t vector_to_binary(std::vector<uint32_t>& v) {
+uint32_t vector_to_binary(std::vector<uint32_t> &v) {
     uint32_t res = 0;
     for (uint32_t elem : v) {
         res |= (1 << elem);
@@ -43,7 +43,7 @@ uint32_t expand_deck(uint32_t hand, uint32_t deck) {
     uint32_t res = 0;
     uint32_t i = 0;
     while (deck) {
-        if (not (hand & 1)) {
+        if (not(hand & 1)) {
             res |= ((deck & 1) << i);
             deck >>= 1;
         }
@@ -58,12 +58,11 @@ uint32_t compactify_deck(uint32_t hand, uint32_t deck) {
     uint32_t res = 0;
     uint32_t i = 0;
     while (deck) {
-        if (not (hand & 1)) {
+        if (not(hand & 1)) {
             res |= ((deck & 1) << i);
             i += 1;
-        }
-        else {
-            assert(not (deck & 1));
+        } else {
+            assert(not(deck & 1));
         }
         deck >>= 1;
         hand >>= 1;
@@ -85,11 +84,11 @@ uint32_t apply_permutation(uint32_t num, uint32_t p1, uint32_t p2, uint32_t p3) 
 }
 
 uint32_t permutations[15] = {
-    0, 2, 1,
-    1, 0, 2,
-    1, 2, 0,
-    2, 0, 1,
-    2, 1, 0
+        0, 2, 1,
+        1, 0, 2,
+        1, 2, 0,
+        2, 0, 1,
+        2, 1, 0
 };
 
 State canonicalize(State state) {
@@ -117,7 +116,7 @@ inline bool eq3(uint32_t v1, uint32_t v2, uint32_t v3) {
     return (v1 == v2) and (v2 == v3);
 }
 
-uint32_t score_combination(std::vector<uint32_t>& combo) {
+uint32_t score_combination(std::vector<uint32_t> &combo) {
     std::vector<uint32_t> rem(combo.size());
     for (uint32_t i = 0; i < combo.size(); i++) {
         rem[i] = combo[i] % 8;
@@ -127,16 +126,13 @@ uint32_t score_combination(std::vector<uint32_t>& combo) {
     if (eq3(combo[0] / 8, combo[1] / 8, combo[2] / 8) and eq3(rem[0], rem[1] - 1, rem[2] - 2)) {
         // same color, consecutive
         return (rem[0]) * 10 + 50;
-    }
-    else if (eq3(rem[0], rem[1], rem[2])) {
+    } else if (eq3(rem[0], rem[1], rem[2])) {
         // same numbers
         return (rem[0]) * 10 + 20;
-    }
-    else if (eq3(rem[0], rem[1] - 1, rem[2] - 2)) {
+    } else if (eq3(rem[0], rem[1] - 1, rem[2] - 2)) {
         // different colors, consecutive
         return (rem[0]) * 10 + 10;
-    }
-    else {
+    } else {
         throw "Tried to score a non-combination";
     }
 }
@@ -186,7 +182,7 @@ std::vector<Move> moves_from_hand(uint32_t hand) {
     std::vector<uint32_t> hand_as_vector = binary_to_vector(hand);
     // Throwing away the least valuable cards first.
     std::sort(hand_as_vector.begin(), hand_as_vector.end(),
-        [](const uint32_t a, const uint32_t b) -> bool { return a % 8 < b % 8; });
+              [](const uint32_t a, const uint32_t b) -> bool { return a % 8 < b % 8; });
 
     std::vector<Move> remove_moves;
     for (uint32_t i : hand_as_vector) {
@@ -202,7 +198,7 @@ std::vector<Move> moves_from_hand(uint32_t hand) {
 
     // Dealing the most valuable combinations first.
     std::sort(deal_moves.begin(), deal_moves.end(),
-        [](const Move& a, const Move& b) -> bool { return a.score_change > b.score_change; });
+              [](const Move &a, const Move &b) -> bool { return a.score_change > b.score_change; });
 
     std::vector<Move> moves;
     moves.insert(moves.end(), deal_moves.begin(), deal_moves.end());
@@ -342,8 +338,7 @@ std::vector<State> outcomes(State state, Move move) {
             card += 1;
             temp >>= 1;
         }
-    }
-    else {
+    } else {
         // deal
         // the slow part BEGINS
         std::vector<uint32_t> deck_vector = binary_to_vector(state.deck);
