@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.8)
-project(cpp)
+project(mu-rainbow)
 
 set(CMAKE_CXX_STANDARD 17)
 #set(CMAKE_CXX_COMPILER clang++)
@@ -21,4 +21,4 @@ set(SOURCE_FILES
         utils.cpp utils.h
         storage.cpp storage.h
         )
-add_executable(mu_roomy ${SOURCE_FILES})
+add_executable(mu_rainbow ${SOURCE_FILES})
