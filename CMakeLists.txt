@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.8)
 project(cpp)
 
 set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_COMPILER clang++)
+#set(CMAKE_CXX_COMPILER clang++)
 
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEV -DDEBUG \
         -g3 -Wall -Wextra -pedantic -Wcast-align -Wcast-qual -Wconversion -Wctor-dtor-privacy \
