@@ -14,7 +14,7 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEV -DDEBUG \
 
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 \
         -DDEV -Wall -Wextra -pedantic -O2 -Wshadow -Wformat=2 -Wfloat-equal -Wconversion \
-        -Wlogical-op -Wcast-qual -Wcast-align")
+        -Wlogical-op -Wcast-qual -Wcast-align -static-libstdc++")
 
 set(SOURCE_FILES
         main.cpp

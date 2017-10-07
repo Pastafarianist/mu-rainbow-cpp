@@ -7,14 +7,14 @@
 
 /* ---------------- Bit operations ---------------- */
 
-//uint32_t num_ones(uint32_t n) {
-//    uint32_t res = 0;
-//    while (n) {
-//        res += 1;
-//        n = n & (n - 1);
-//    }
-//    return res;
-//}
+uint32_t num_ones(uint32_t n) {
+    uint32_t res = 0;
+    while (n) {
+        res += 1;
+        n = n & (n - 1);
+    }
+    return res;
+}
 
 uint32_t vector_to_binary(std::vector<uint32_t> &v) {
     uint32_t res = 0;
@@ -221,11 +221,11 @@ std::vector<Move> moves_from_hand(uint32_t hand) {
 class CombinationGen {
 private:
     std::vector<bool> mask;
-    std::size_t n, k;
+    std::size_t n_, k_;
     bool is_done;
 
 public:
-    CombinationGen(std::size_t n, std::size_t k) : n(n), k(k), is_done(false) {
+    CombinationGen(std::size_t n, std::size_t k) : n_(n), k_(k), is_done(false) {
         mask.resize(n);
         std::fill(mask.begin(), mask.begin() + k, true);
     }
@@ -240,9 +240,9 @@ public:
         }
 
         std::vector<uint32_t> result;
-        result.reserve(k);
+        result.reserve(k_);
 
-        for (uint32_t i = 0; i < n; i++) {
+        for (uint32_t i = 0; i < n_; i++) {
             if (mask[i]) {
                 result.push_back(i);
             }
@@ -362,4 +362,8 @@ std::vector<State> outcomes(State state, Move move) {
         // the slow part ENDS
     }
     return result;
+}
+
+bool is_storable(State state) {
+    return (state.score < 40) and (state.deck) and (num_ones(state.hand) == 5);
 }

@@ -20,7 +20,7 @@ std::unordered_map<uint32_t, uint32_t> make_hands5_factor_rev() {
     std::sort(hands5_factor.begin(), hands5_factor.end());
 
     std::unordered_map<uint32_t, uint32_t> result;
-    for (uint32_t i = 0; i < hands5_factor.size(); i++) {
+    for (uint32_t i = 0; i < hands5_factor.size(); ++i) {
         result[hands5_factor[i]] = i;
     }
 
@@ -32,11 +32,21 @@ std::unordered_map<uint32_t, uint32_t> hands5_factor_rev = make_hands5_factor_re
 std::size_t Storage::state_to_offset(State state) {
     State cstate = canonicalize(state);
     std::size_t idx = cstate.score;
+
+//    vector<uint32_t> vhand = binary_to_vector(cstate.hand);
+//    for (uint32_t card : vhand) {
+//        std::cerr << card << ", ";
+//    }
+//    std::cerr << std::endl;
+
+    assert(hands5_factor_rev.find(cstate.hand) != hands5_factor_rev.end());
+
     std::size_t hand_offset = hands5_factor_rev[cstate.hand];
     std::size_t deck_offset = compactify_deck(cstate.hand, cstate.deck);
 
-    // Multiplication by 2**19.
     assert(hands5_factor_rev.size() == 7448);
+
+    // Multiplication by 2**19.
     std::size_t offset = ((idx * 7448 + hand_offset) << 19) + deck_offset;
     return offset;
 }
