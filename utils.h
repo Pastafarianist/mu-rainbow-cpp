@@ -11,11 +11,11 @@
 /* ---------------- Datatypes ---------------- */
 
 struct State {
-    int score, hand, deck;
+    uint32_t score, hand, deck;
 };
 
 struct Move {
-    int action, param, score_change;
+    uint32_t action, param, score_change;
 };
 
 /* ------ Kind of private but not really ------*/
@@ -26,9 +26,9 @@ std::vector<State> outcomes(State state, Move move);
 /* ------------ Exported functions ------------*/
 
 State canonicalize(State state);
-int compactify_deck(int hand, int deck);
+uint32_t compactify_deck(uint32_t hand, uint32_t deck);
 
-std::vector<int> make_hands(std::size_t hand_size);
+std::vector<uint32_t> make_hands(std::size_t hand_size);
 
 template<typename T>
 void mark_states_reachable_from(State state, T& storage) {

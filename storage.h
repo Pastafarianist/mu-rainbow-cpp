@@ -1,8 +1,9 @@
 #ifndef CPP_STORAGE_H
 #define CPP_STORAGE_H
 
-#include "utils.h"
 #include <bitset>
+#include <cstdint>
+#include "utils.h"
 
 const std::size_t bs_size = 40L * 7448L * (1L << 19);
 
@@ -33,7 +34,7 @@ private:
         }
 
     public:
-        Proxy(std::bitset<bs_size>* bs, std::size_t idx) {};
+        Proxy(std::bitset<bs_size>* bs, std::size_t idx) : bs_(bs), idx_(idx) {};
     };
 
 public:

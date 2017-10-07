@@ -14,26 +14,26 @@
 
 using std::vector;
 
-std::unordered_map<int, int> make_hands5_factor_rev() {
-    vector<int> hands5 = make_hands(5);
-    std::unordered_set<int> set_hands;
-    for (int hand : hands5) {
+std::unordered_map<uint32_t, uint32_t> make_hands5_factor_rev() {
+    vector<uint32_t> hands5 = make_hands(5);
+    std::unordered_set<uint32_t> set_hands;
+    for (uint32_t hand : hands5) {
         State cstate = canonicalize(State {0, hand, 0});
-        int chand = cstate.hand;
+        uint32_t chand = cstate.hand;
         set_hands.insert(chand);
     }
-    vector<int> hands5_factor(set_hands.begin(), set_hands.end());
+    vector<uint32_t> hands5_factor(set_hands.begin(), set_hands.end());
     std::sort(hands5_factor.begin(), hands5_factor.end());
 
-    std::unordered_map<int, int> result;
-    for (int i = 0; i < hands5_factor.size(); i++) {
+    std::unordered_map<uint32_t, uint32_t> result;
+    for (uint32_t i = 0; i < hands5_factor.size(); i++) {
         result[hands5_factor[i]] = i;
     }
 
     return result;
-};
+}
 
-std::unordered_map<int, int> hands5_factor_rev = make_hands5_factor_rev();
+std::unordered_map<uint32_t, uint32_t> hands5_factor_rev = make_hands5_factor_rev();
 
 std::size_t Storage::state_to_offset(State state) {
     State cstate = canonicalize(state);
@@ -52,9 +52,9 @@ template<std::size_t I>
 void Storage::bitset_dump(const std::bitset<I>& in, std::ostream& out) {
     // export a bitset consisting of I bits to an output stream.
     // Eight bits are stored to a single stream byte.
-    unsigned int i = 0;  // the current bit index
-    unsigned char c = 0; // the current byte
-    short bits = 0;      // to process next byte
+    std::size_t i = 0;  // the current bit index
+    uint8_t c = 0; // the current byte
+    uint8_t bits = 0;      // to process next byte
     while(i < in.size()) {
         c = c << 1;
         if(in[i]) ++c; // adding 1 if bit is true
