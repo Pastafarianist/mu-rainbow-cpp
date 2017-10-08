@@ -137,8 +137,8 @@ uint32_t score_combination(std::vector<uint32_t> &combo) {
     }
 }
 
-std::vector<std::pair<uint32_t, std::vector<uint32_t>>> card_combinations(std::vector<uint32_t> hand) {
-    std::vector<std::pair<uint32_t, std::vector<uint32_t>>> result;
+std::vector<std::pair<uint16_t, std::vector<uint32_t>>> card_combinations(std::vector<uint32_t> hand) {
+    std::vector<std::pair<uint16_t, std::vector<uint32_t>>> result;
 
     std::vector<std::vector<uint32_t>> v2c(8);
     for (uint32_t card : hand) {
@@ -146,12 +146,12 @@ std::vector<std::pair<uint32_t, std::vector<uint32_t>>> card_combinations(std::v
     }
 
     // different colors, consecutive
-    for (uint32_t v = 0; v < 6; v++) {
+    for (uint16_t v = 0; v < 6; v++) {
         if (!v2c[v].empty() and !v2c[v + 1].empty() and !v2c[v + 2].empty()) {
             for (uint32_t col1 : v2c[v]) {
                 for (uint32_t col2 : v2c[v + 1]) {
                     for (uint32_t col3 : v2c[v + 2]) {
-                        uint32_t score = eq3(col1, col2, col3) ? v * 10 + 50 : v * 10 + 10;
+                        uint16_t score = eq3(col1, col2, col3) ? v * 10 + 50 : v * 10 + 10;
                         std::vector<uint32_t> combo = {v + col1 * 8, v + 1 + col2 * 8, v + 2 + col3 * 8};
                         assert(score_combination(combo) == score);
                         result.emplace_back(score, combo);
@@ -162,10 +162,10 @@ std::vector<std::pair<uint32_t, std::vector<uint32_t>>> card_combinations(std::v
     }
 
     // same numbers
-    for (uint32_t v = 0; v < v2c.size(); v++) {
+    for (uint16_t v = 0; v < v2c.size(); v++) {
         std::vector<uint32_t> colors = v2c[v];
         if (colors.size() == 3) {
-            uint32_t score = v * 10 + 20;
+            uint16_t score = v * 10 + 20;
             std::vector<uint32_t> combo = {v + colors[0] * 8, v + colors[1] * 8, v + colors[2] * 8};
             assert(score_combination(combo) == score);
             result.emplace_back(score, combo);
@@ -190,10 +190,10 @@ std::vector<Move> moves_from_hand(uint32_t hand) {
     }
 
     std::vector<Move> deal_moves;
-    for (std::pair<uint32_t, std::vector<uint32_t>> p : card_combinations(hand_as_vector)) {
-        uint32_t score = p.first;
+    for (std::pair<uint16_t, std::vector<uint32_t>> p : card_combinations(hand_as_vector)) {
+        uint16_t score = p.first;
         std::vector<uint32_t> combo = p.second;
-        deal_moves.push_back(Move {1, vector_to_binary(combo), score / 10});
+        deal_moves.push_back(Move {1, vector_to_binary(combo), score / static_cast<uint16_t>(10)});
     }
 
     // Dealing the most valuable combinations first.
@@ -321,7 +321,7 @@ std::vector<Move> moves(State state) {
 std::vector<State> outcomes(State state, Move move) {
     assert(state.deck);
     assert((state.hand & move.param) == move.param);
-    uint32_t new_score = state.score + move.score_change;
+    uint16_t new_score = state.score + move.score_change;
     uint32_t new_hand_partial = state.hand ^ move.param;
     std::vector<State> result;
 

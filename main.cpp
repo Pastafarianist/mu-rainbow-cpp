@@ -10,6 +10,7 @@ int main() {
         std::cout << "Processing state " << (i + 1) << "/" << starting_states.size() << std::endl;
         mark_states_reachable_from(starting_states[i], *storage);
     }
+    storage->dump("reachability.bin");
     delete storage;
     return 0;
 }

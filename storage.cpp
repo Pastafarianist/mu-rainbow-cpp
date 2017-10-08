@@ -98,9 +98,11 @@ void Storage::bitset_restore(std::istream &in, std::bitset<I> &out) {
     }
 }
 
+Storage::Storage() : total_use(0), bucket_use(40) {}
+
 Storage::Proxy Storage::operator[](State state) {
     std::size_t idx = state_to_offset(state);
-    return Proxy(&bs, idx);
+    return Proxy(this, idx, state.score);
 }
 
 void Storage::dump(std::string path) {

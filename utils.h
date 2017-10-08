@@ -7,11 +7,13 @@
 /* ---------------- Datatypes ---------------- */
 
 struct State {
-    uint32_t score, hand, deck;
+    uint16_t score;
+    uint32_t hand, deck;
 };
 
 struct Move {
-    uint32_t action, param, score_change;
+    uint32_t action, param;
+    uint16_t score_change;
 };
 
 /* ------ Kind of private but not really ------*/
