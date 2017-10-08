@@ -193,7 +193,7 @@ std::vector<Move> moves_from_hand(uint32_t hand) {
     for (std::pair<uint16_t, std::vector<uint32_t>> p : card_combinations(hand_as_vector)) {
         uint16_t score = p.first;
         std::vector<uint32_t> combo = p.second;
-        deal_moves.push_back(Move {1, vector_to_binary(combo), score / static_cast<uint16_t>(10)});
+        deal_moves.push_back(Move {1, vector_to_binary(combo), score / 10});
     }
 
     // Dealing the most valuable combinations first.

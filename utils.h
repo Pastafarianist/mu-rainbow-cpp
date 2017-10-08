@@ -46,8 +46,7 @@ void mark_states_reachable_from(State state, T &storage) {
 
         for (Move &move : moves(state)) {
             std::vector<State> curr_outcomes = outcomes(state, move);
-            auto num_outcomes = static_cast<int>(curr_outcomes.size());
-            assert(num_outcomes > 0);
+            assert(not curr_outcomes.empty());
 
             for (State &outcome : curr_outcomes) {
                 if (is_storable(outcome) and (not storage[outcome])) {
